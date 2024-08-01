@@ -34,6 +34,7 @@ class CGI:
 			self.data[lName][oType]=[]
 			self.selection[lName][oType]=[]
 	def __add__(self,other):
+		if self.debug:print('cgi.add.self.data.begin -----------------(o)(o)-----')
 		if self.debug:print('cgi.add.self.data',self.data)
 		if self.debug:print('cgi.add.self.layers',self.layers)
 		if self.debug:print('cgi.add.other.data',other.data)

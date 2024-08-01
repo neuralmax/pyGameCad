@@ -54,39 +54,60 @@ class Parametric():
 			self.rotate(cgit,i*18)
 			cgi=cgi+cgit
 	def demoEngravingSpindleTest(self,cgi):
-		fx,fy=35,40
+		fx,fy=30,40
 		cgit=CGI()
 		line=Line(cgit,{})
-		cgit=line.generate((-5,-5),(-5,fy))
+		cgit=line.generate((-5,-5),(-5,fy),cgit)
 		cgi=cgi+cgit
-		cgit=line.generate((-5,-5),(fx,-5))
+		cgit=CGI()
+		cgit=line.generate((-5,-5),(fx,-5),cgit)
 		cgi=cgi+cgit
-		cgit=line.generate((-5,fy),(fx,fy))
+		cgit=CGI()
+		cgit=line.generate((-5,fy),(fx,fy),cgit)
 		cgi=cgi+cgit
-		cgit=line.generate((fx,-5),(fx,fy))
+		cgit=CGI()
+		cgit=line.generate((fx,-5),(fx,fy),cgit)
 		cgi=cgi+cgit
 		for i in range(10):
 			cgit=CGI()
 			line=Line(cgit,{})
-			cgit.createLayer(str(i+1),(i*25,0,255-i*25),i*10,10)
+			cgit.createLayer(str(i+1),(i*25,0,255-i*25),10+i*10,10)
+			#cgit.createLayer(str(i+1),(i*25,0,255-i*25),i*1,10)
 			line.generate([0,i*3],[30,i*3],cgit)
 			cgi=cgi+cgit
+	def demoSingleLineTest(self,cgi):
+		fx,fy=30,40
+		cgit=CGI()
+		line=Line(cgit,{})
+		cgit=line.generate((-5,-5),(-5,fy),cgit)
+		cgi=cgi+cgit
+		del cgit
+		#if self.debug:print('parametric.cgit.data a (o)',cgit.data)
+		cgit=CGI()
+		if self.debug:print('parametric.cgit.data b (o)(o)',cgit.data)
+		cgit=line.generate((-5,-5),(55,-5),cgit)
+		if self.debug:print('parametric.cgit.data b (o)(o)(o)',cgit.data)
+		cgi=cgi+cgit
 	def demoTextSizeTest(self,cgi):
 		cgit=CGI()
 		line=Line(cgit,{})
-		cgit=line.generate((-5,-5),(-5,45))
+		cgit=CGI()
+		cgit=line.generate((-5,-5),(-5,45),cgit)
 		cgi=cgi+cgit
-		cgit=line.generate((-5,-5),(55,-5))
+		cgit=CGI()
+		cgit=line.generate((-5,-5),(55,-5),cgit)
 		cgi=cgi+cgit
-		cgit=line.generate((-5,45),(55,45))
+		cgit=CGI()
+		cgit=line.generate((-5,45),(55,45),cgit)
 		cgi=cgi+cgit
-		cgit=line.generate((55,-5),(55,45))
+		cgit=CGI()
+		cgit=line.generate((55,-5),(55,45),cgit)
 		cgi=cgi+cgit
 		for j,sc in enumerate([3,2.5,2,1.5,1]):
 			for i,ch in enumerate('enter the matrix'):
 				if self.debug:print('parametric.demoTextOnCurve.i',i,ch)
 				cgit=CGI()
-				cgit.createLayer('1',(255,255,0),10,10)
+				cgit.createLayer('1',(255,255,0),50,10)
 				font=Font(cgit,{})
 				line=Line(cgit,{})
 				cgit=font.generate(ch,cgit)
@@ -132,8 +153,9 @@ class Parametric():
 			#self.demoTexInLine(cgi)
 			#self.demoTextOnCurve(cgi)
 			#self.demoEngravingSpindleTest(cgi)
-			#self.demoTextSizeTest(cgi)
-			self.demoHoleSizeTest(cgi)
+			self.demoTextSizeTest(cgi)
+			#self.demoHoleSizeTest(cgi)
+			#self.demoSingleLineTest(cgi)
 
 
 			#cgi.addEntity(layer,'line',[[0,0],[0,10]])
