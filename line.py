@@ -37,8 +37,11 @@ class Line():
 			return True
 		else:
 			return False
-	def generate(self,pnta,pntb,cgi=CGI()):
+	def generate(self,pnta,pntb,cgi=False):
+		if not cgi:
+			cgi=CGI()
 		cgi.addEntity('line',[pnta,pntb])
+		if self.debug:print('generate (o)(o)',cgi.data)
 		return cgi
 	def draw(self,pg,win,clr,dat,zoom,panx,pany):
 		#xa,ya,xb,yb,xc,yc,xd,yd=self.unpack(dat)

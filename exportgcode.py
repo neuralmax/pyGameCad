@@ -15,6 +15,7 @@ class ExportGcode:
 	def event(self,pg,cgi,event,state,layer):
 		if event.type==pg.KEYDOWN and event.key==pg.K_g:
 			if self.debug:print('ExportGcode.event')
+			print('ExportGcode.event.cgi.data',cgi.data)
 			cgit=CGI()
 			line=Line(cgit,{})
 			bezier=Bezier(cgit,{})
@@ -47,9 +48,12 @@ class ExportGcode:
 			layerNms=cgi.layers.keys()
 			layerNms=sorted(layerNms,reverse=True)
 			counter=0
+
 			for layerNm in layerNms:
+				data+=';\n'
+				data+=';=--(o)(o)--=\n'
 				spinsp=cgi.layers[layerNm]['M4']
-				data+='M4 S'+str(spinsp)+' ; spindle speed'
+				data+='M4 S'+str(spinsp)+' ; spindle speed\n'
 				power=cgi.layers[layerNm]['power']
 				data+='M68 E0 Q'+str(power)+'; set power of laser\n'
 				for oType in cgi.data[layerNm].keys():
@@ -61,25 +65,26 @@ class ExportGcode:
 							xa,ya,xb,yb=line.unpack(dat)
 							data+='G0 X'+str(xa)+' Y'+str(-ya)+'; Rapid to initial position\n'
 							data+='G0 Z0.000\n'
-							data+='G1 Z-1.000 F1000 S10000 ; plunge\n'
+							data+='G1 Z-1.000 F1000 ; plunge\n'
 							data+='; cut\n'
-							data+='G1 X'+str(xb)+' Y'+str(-yb)+' F500 S10000\n'
+							data+='G1 X'+str(xb)+' Y'+str(-yb)+' F500\n'
 						elif oType=='circle':
 							x,y,r=circle.unpack(dat)
 							data+='G0 X'+str(x)+' Y'+str(-y+r)+'; Rapid to initial position\n'
 							data+='G0 Z0.000\n'
-							data+='G1 Z-1.000 F1000 S10000 ; plunge\n'
+							data+='G1 Z-1.000 F1000 ; plunge\n'
 							data+='; cut\n'
-							data+='G2 X'+str(x)+' Y'+str(-y)+'\n'
+							data+='G2 I'+str(x)+' J'+str(-r)+'\n'
 						elif oType=='bezier':
 							xa,ya,xb,yb,xc,yc,xd,yd=bezier.unpack(dat)
 							data+='G0 X'+str(xa)+' Y'+str(-ya)+'; Rapid to initial position\n'
 							data+='G0 Z0.000\n'
-							data+='G1 Z-1.000 F1000 S10000 ; plunge\n'
+							data+='G1 Z-1.000 F1000 ; plunge\n'
 							data+='; cut\n'
-							data+='G5 X'+str(xb)+' Y'+str(-yb)+' I'+str(xc)+' J'+str(-yc)+' P'+str(xd)+' Q'+str(-yd)+'\n'
+							#data+='G5 X'+str(xb-xa)+' Y'+str(-yb-ya)+' I'+str(xc-xa)+' J'+str(-yc+ya)+' P'+str(xd)+' Q'+str(-yd)+'\n'
+							data+='G5.1 X'+str(xc)+' Y'+str(-yc)+' I'+str(xb-xa)+' J'+str(-yb+ya)+'\n'
 						data+='G0 Z0.000 ; Retract\n'
-			data+='M5          ; Switch tool offEnd'
+			data+='M5          ; Switch tool offEnd\n'
 			data+='%'
 			with open('test.gcode', 'w') as file:
 				file.write(data)

@@ -34,6 +34,7 @@ class CGI:
 			self.data[lName][oType]=[]
 			self.selection[lName][oType]=[]
 	def __add__(self,other):
+		if self.debug:print('cgi.add.self.data.begin -----------------(o)(o)-----')
 		if self.debug:print('cgi.add.self.data',self.data)
 		if self.debug:print('cgi.add.self.layers',self.layers)
 		if self.debug:print('cgi.add.other.data',other.data)
@@ -46,6 +47,8 @@ class CGI:
 				self.curLayer=layer
 			for oType in other.data[layer].keys() :
 				if self.debug:print('cgi.add.otype',oType)
+				if not oType in self.data[layer].keys():
+					self.data[layer][oType]=[]
 				for dat in other.data[layer][oType]:
 					if self.debug:print('cgi.add.dat',dat)
 					self.addEntity(oType,dat)
