@@ -47,6 +47,8 @@ class CGI:
 				self.curLayer=layer
 			for oType in other.data[layer].keys() :
 				if self.debug:print('cgi.add.otype',oType)
+				if not oType in self.data[layer].keys():
+					self.data[layer][oType]=[]
 				for dat in other.data[layer][oType]:
 					if self.debug:print('cgi.add.dat',dat)
 					self.addEntity(oType,dat)

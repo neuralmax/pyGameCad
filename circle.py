@@ -7,10 +7,12 @@ class Circle():
 		self.drawable=True
 		#self.data=     {'0':{'lines':[]}}
 		#self.selection={'0':{'lines':[]}}
+		self.addTypeCgi(cgi)
+		keys['c']=self.name
+	def addTypeCgi(self,cgi):
 		for layer in cgi.data.keys():
 			cgi.data[layer]['circle']=[]
 			cgi.selection[layer]['circle']=[]
-		keys['c']=self.name
 	def event(self,pg,cgi,event,state,layer):
 		if event.type==pg.KEYDOWN and event.key==pg.K_c:
 			#                      [center[x,y],radius]
@@ -19,7 +21,7 @@ class Circle():
 			return True
 		else:
 			return False
-	def generate(self,pnt,rad,cgi=CGI()):
+	def generate(self,pnt,rad,cgi):
 		cgi.addEntity('circle',[pnt,rad])
 		return cgi
 	def draw(self,pg,win,clr,dat,zoom,panx,pany):
@@ -38,6 +40,7 @@ class Circle():
 		return (x-rad,y-rad,x+rad,y+rad)
 	def move(self,dat,vec):
 		xa,ya=dat[0]
+		xv,yv=vec
 		return [[xa+xv,ya+yv],dat[1]]
 	def scale(self,dat,sc):
 		xa,ya=dat[0]

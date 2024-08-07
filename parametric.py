@@ -6,6 +6,7 @@ from circle import Circle
 from line import Line
 from cgi import CGI
 from fontsecession import fontdata
+from math import atan2,degrees
 class Parametric():
 	def __init__(self,cgi,keys,plugins):
 		self.name='Parametric'
@@ -31,6 +32,30 @@ class Parametric():
 			for oType in cgi.data[layer].keys():
 				for i,dat in enumerate(cgi.data[layer][oType]):
 					cgi.data[layer][oType][i]=self.plugins[oType].rotate(dat,ang)
+	def square(self,pnt,center=False):
+		tx,ty=pnt
+		if center:
+			sx=-tx/2
+			sy=-ty/2
+			fx=tx/2
+			fy=ty/2
+		else:
+			sx=0
+			sy=0
+			fx=tx
+			fy=ty
+		cgisq=CGI()
+		cgitl=CGI()
+		line=Line(cgisq,{})
+		cgitl=line.generate((sx,sy),(sx,fy))
+		cgisq=cgisq+cgitl
+		cgitl=line.generate((sx,sy),(fx,sy))
+		cgisq=cgisq+cgitl
+		cgitl=line.generate((sx,fy),(fx,fy))
+		cgisq=cgisq+cgitl
+		cgitl=line.generate((fx,sy),(fx,fy))
+		cgisq=cgisq+cgitl
+		return cgisq
 	def demoTexInLine(self,cgi):
 		for i,charname in enumerate(fontdata.keys()):
 			#charname='a'
@@ -43,16 +68,29 @@ class Parametric():
 			self.move(cgit,[i*110,0])
 			if self.debug:print('parametric.event.add')
 			cgi=cgi+cgit
-	def demoTextOnCurve(self,cgi):
-		for i,ch in enumerate('yyyyyyyyy'):
+	def textOnCurve(self,cgi,text,s,r,top):
+		step=degrees(atan2(s,r))*1.2
+		#step=atan2(r,s)
+		font=Font(cgi,{})
+		line=Line(cgi,{})
+		if self.debug:print('parametric.demoTextOnCurve.step r s',step,r,s)
+		if top:
+			r=-r
+		for i,ch in enumerate(text):
 			if self.debug:print('parametric.demoTextOnCurve.i',i,ch)
 			cgit=CGI()
 			font=Font(cgit,{})
 			line=Line(cgit,{})
-			cgit=font.generate(ch)
-			self.move(cgit,[-50,-500])
-			self.rotate(cgit,i*18)
+			cgit=font.generate(ch,cgit)
+			if top:
+				self.move(cgit,[-50,-100])
+			else:
+				self.move(cgit,[-50,0])
+			self.scale(cgit,0.01*s)
+			self.move(cgit,[0,r])
+			self.rotate(cgit,step*i-step*((len(text)-1)/2))
 			cgi=cgi+cgit
+		return cgi
 	def demoEngravingSpindleTest(self,cgi):
 		fx,fy=30,40
 		cgit=CGI()
@@ -105,7 +143,7 @@ class Parametric():
 		cgi=cgi+cgit
 		for j,sc in enumerate([3,2.5,2,1.5,1]):
 			for i,ch in enumerate('enter the matrix'):
-				if self.debug:print('parametric.demoTextOnCurve.i',i,ch)
+				if self.debug:print('parametric.demoTextSizeTest.i',i,ch)
 				cgit=CGI()
 				cgit.createLayer('1',(255,255,0),50,10)
 				font=Font(cgit,{})
@@ -117,18 +155,11 @@ class Parametric():
 				self.move(cgit,[0,j*10])
 				cgi=cgi+cgit
 	def demoHoleSizeTest(self,cgi):
-		fx,fy=10,30
-		cgit=CGI()
-		line=Line(cgit,{})
-		cgit=line.generate((-5,-5),(-5,fy))
+		cgit=self.square([30,50],center=True)
+		self.move(cgit,[0,10])
 		cgi=cgi+cgit
-		cgit=line.generate((-5,-5),(fx,-5))
-		cgi=cgi+cgit
-		cgit=line.generate((-5,fy),(fx,fy))
-		cgi=cgi+cgit
-		cgit=line.generate((fx,-5),(fx,fy))
-		cgi=cgi+cgit
-		for i,r in enumerate([6,6.1,6.2]):
+		circle=Circle(cgi,{})
+		for i,r in enumerate([8,8.1,8.2]):
 			if self.debug:print('parametric.demoHoleSizeTest.i',i,r)
 			cgit=CGI()
 			cgit.createLayer('1',(255,255,0))
@@ -136,16 +167,27 @@ class Parametric():
 			cgit=circle.generate([0,10*i],r/2,cgit)
 			if self.debug:print('parametric.demoHoleSizeTest.cgit',cgit)
 			cgi=cgi+cgit
-	def demoKey(self,cgi):
-		for i,ch in enumerate('yyyyyyyyy'):
-			if self.debug:print('parametric.demoTextOnCurve.i',i,ch)
-			cgit=CGI()
-			font=Font(cgit,{})
-			line=Line(cgit,{})
-			cgit=font.generate(ch)
-			self.move(cgit,[-50,-500])
-			self.rotate(cgit,i*18)
-			cgi=cgi+cgit
+			cgis=self.square([1,4],center=True)
+			self.move(cgis,[5.5+4,10*i])
+			cgi=cgi+cgis
+	def demoKeyTest(self,cgi,text):
+		cgit=self.square([30,30],center=True)
+		cgi=cgi+cgit
+		cgit=CGI()
+		font=Font(cgi,{})
+		line=Line(cgi,{})
+		cgit.createLayer('1',(255,255,0))
+		circle=Circle(cgit,{})
+		cgit=circle.generate([0,0],8.1/2,cgit)
+		cgit.createLayer('3',(0,255,0),50,10)#engrave
+		cgit=CGI()
+		cgit=self.textOnCurve(cgit,'enterthematrix',2,15,True)
+		cgi=cgi+cgit
+		cgit=CGI()
+		cgit=self.textOnCurve(cgit,'1235456',2,18,True)
+		cgi=cgi+cgit
+
+
 	def event(self,pg,cgi,event,state,layer):
 		cmdMsg=''
 		if event.type==pg.KEYDOWN and event.key==pg.K_p:
@@ -153,9 +195,14 @@ class Parametric():
 			#self.demoTexInLine(cgi)
 			#self.demoTextOnCurve(cgi)
 			#self.demoEngravingSpindleTest(cgi)
-			self.demoTextSizeTest(cgi)
-			#self.demoHoleSizeTest(cgi)
+			#self.demoTextSizeTest(cgi)
 			#self.demoSingleLineTest(cgi)
+
+			#self.demoHoleSizeTest(cgi)
+			#self.textOnCurve(cgi,'enterthematrix',2,15,True)
+			#self.textOnCurve(cgi,'1235456',2,18,True)
+			#demoTextOnCurve(self,cgi,text,s,r,top):
+			self.demoKeyTest(cgi,'enter')
 
 
 			#cgi.addEntity(layer,'line',[[0,0],[0,10]])
