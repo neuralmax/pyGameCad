@@ -11,7 +11,7 @@ class Line():
 		#self.selection={'0':{'lines':[]}}
 		self.prime(cgi)
 		keys['l']=self.name
-		self.debug=False
+		self.debug=True
 	def prime(self,cgi):
 		for layer in cgi.data.keys():
 			cgi.data[layer]['line']=[]
@@ -40,6 +40,7 @@ class Line():
 	def generate(self,pnta,pntb,cgi=False):
 		if not cgi:
 			cgi=CGI()
+		if self.debug:print('generate (o)',cgi.data)
 		cgi.addEntity('line',[pnta,pntb])
 		if self.debug:print('generate (o)(o)',cgi.data)
 		return cgi

@@ -21,7 +21,7 @@ class CGI:
 			for line in cgi.data['line']:
 				outfile.write('"'+LineString(line).wkt+'"\n')
 	def addEntity(self,oType,dat):
-		if self.debug:print('cgi.addEntity',self.data)
+		if self.debug:print('cgi.addEntity',self.data,oType)
 		self.data[self.curLayer][oType].append(dat)
 		self.selection[self.curLayer][oType].append(False)
 	def createLayer(self,lName,color,m4=1000,power=80):
@@ -49,6 +49,7 @@ class CGI:
 				if self.debug:print('cgi.add.otype',oType)
 				if not oType in self.data[layer].keys():
 					self.data[layer][oType]=[]
+					self.selection[layer][oType]=[]
 				for dat in other.data[layer][oType]:
 					if self.debug:print('cgi.add.dat',dat)
 					self.addEntity(oType,dat)

@@ -32,7 +32,7 @@ class Parametric():
 			for oType in cgi.data[layer].keys():
 				for i,dat in enumerate(cgi.data[layer][oType]):
 					cgi.data[layer][oType][i]=self.plugins[oType].rotate(dat,ang)
-	def square(self,pnt,center=False):
+	def square(self,pnt,center=False,layerName='0'):
 		tx,ty=pnt
 		if center:
 			sx=-tx/2
@@ -45,15 +45,23 @@ class Parametric():
 			fx=tx
 			fy=ty
 		cgisq=CGI()
-		cgitl=CGI()
+		if layerName!='0':cgisq.createLayer(layerName,(255,255,0))
 		line=Line(cgisq,{})
-		cgitl=line.generate((sx,sy),(sx,fy))
+		cgitl=CGI()
+		if layerName!='0':cgitl.createLayer(layerName,(255,255,0))
+		cgitl=line.generate((sx,sy),(sx,fy),cgitl)
 		cgisq=cgisq+cgitl
-		cgitl=line.generate((sx,sy),(fx,sy))
+		cgitl=CGI()
+		if layerName!='0':cgitl.createLayer(layerName,(255,255,0))
+		cgitl=line.generate((sx,sy),(fx,sy),cgitl)
 		cgisq=cgisq+cgitl
-		cgitl=line.generate((sx,fy),(fx,fy))
+		cgitl=CGI()
+		if layerName!='0':cgitl.createLayer(layerName,(255,255,0))
+		cgitl=line.generate((sx,fy),(fx,fy),cgitl)
 		cgisq=cgisq+cgitl
-		cgitl=line.generate((fx,sy),(fx,fy))
+		cgitl=CGI()
+		if layerName!='0':cgitl.createLayer(layerName,(255,255,0))
+		cgitl=line.generate((fx,sy),(fx,fy),cgitl)
 		cgisq=cgisq+cgitl
 		return cgisq
 	def demoTexInLine(self,cgi):
@@ -76,6 +84,8 @@ class Parametric():
 		if self.debug:print('parametric.demoTextOnCurve.step r s',step,r,s)
 		if top:
 			r=-r
+		else:
+			step=-step
 		for i,ch in enumerate(text):
 			if self.debug:print('parametric.demoTextOnCurve.i',i,ch)
 			cgit=CGI()
@@ -104,10 +114,10 @@ class Parametric():
 		cgit=line.generate((-5,fy),(fx,fy),cgit)
 		cgi=cgi+cgit
 		cgit=CGI()
+		cgit=CGI()
 		cgit=line.generate((fx,-5),(fx,fy),cgit)
 		cgi=cgi+cgit
 		for i in range(10):
-			cgit=CGI()
 			line=Line(cgit,{})
 			cgit.createLayer(str(i+1),(i*25,0,255-i*25),10+i*10,10)
 			#cgit.createLayer(str(i+1),(i*25,0,255-i*25),i*1,10)
@@ -168,25 +178,53 @@ class Parametric():
 			if self.debug:print('parametric.demoHoleSizeTest.cgit',cgit)
 			cgi=cgi+cgit
 			cgis=self.square([1,4],center=True)
-			self.move(cgis,[5.5+4,10*i])
+			self.move(cgis,[5+4,10*i])
 			cgi=cgi+cgis
-	def demoKeyTest(self,cgi,text):
+	def demoKeyTest(self,cgi,text,textt,textb,textl,textr):
+		font=Font(cgi,{})
+		line=Line(cgi,{})
+		cgit=CGI()
 		cgit=self.square([30,30],center=True)
 		cgi=cgi+cgit
 		cgit=CGI()
-		font=Font(cgi,{})
-		line=Line(cgi,{})
 		cgit.createLayer('1',(255,255,0))
 		circle=Circle(cgit,{})
 		cgit=circle.generate([0,0],8.1/2,cgit)
-		cgit.createLayer('3',(0,255,0),50,10)#engrave
-		cgit=CGI()
-		cgit=self.textOnCurve(cgit,'enterthematrix',2,15,True)
-		cgi=cgi+cgit
-		cgit=CGI()
-		cgit=self.textOnCurve(cgit,'1235456',2,18,True)
 		cgi=cgi+cgit
 
+		cgis=self.square([1,4],center=True,layerName='1')
+		self.move(cgis,[5+4,0])
+		self.rotate(cgis,90)
+		cgi=cgi+cgis
+
+		cgit=CGI()
+		cgit.createLayer('3',(0,255,0),50,10)#engrave
+		cgit=self.textOnCurve(cgit,text,2,8,True)
+		cgi=cgi+cgit
+		cgit=CGI()
+		cgit=self.textOnCurve(cgit,textt,2,11,True)
+		cgi=cgi+cgit
+		cgit=CGI()
+		cgit=self.textOnCurve(cgit,textb,2,11,False)
+		cgi=cgi+cgit
+
+		cgit=CGI()
+		font=Font(cgit,{})
+		line=Line(cgit,{})
+		cgit=font.generate(textl)
+		self.move(cgit,[-50,-50])
+		self.scale(cgit,0.01*4)
+		self.move(cgit,[-10,0])
+		cgi=cgi+cgit
+
+		cgit=CGI()
+		font=Font(cgit,{})
+		line=Line(cgit,{})
+		cgit=font.generate(textr)
+		self.move(cgit,[-50,-50])
+		self.scale(cgit,0.01*4)
+		self.move(cgit,[10,0])
+		cgi=cgi+cgit
 
 	def event(self,pg,cgi,event,state,layer):
 		cmdMsg=''
@@ -202,7 +240,7 @@ class Parametric():
 			#self.textOnCurve(cgi,'enterthematrix',2,15,True)
 			#self.textOnCurve(cgi,'1235456',2,18,True)
 			#demoTextOnCurve(self,cgi,text,s,r,top):
-			self.demoKeyTest(cgi,'enter')
+			self.demoKeyTest(cgi,'top','toptop','bottom','l','r')#cgi,text,textt,textb,textl,textr)
 
 
 			#cgi.addEntity(layer,'line',[[0,0],[0,10]])
