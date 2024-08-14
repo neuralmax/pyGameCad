@@ -7,6 +7,7 @@ from line import Line
 from cgi import CGI
 from fontsecession import fontdata
 from math import atan2,degrees
+import csv
 class Parametric():
 	def __init__(self,cgi,keys,plugins):
 		self.name='Parametric'
@@ -76,28 +77,37 @@ class Parametric():
 			self.move(cgit,[i*110,0])
 			if self.debug:print('parametric.event.add')
 			cgi=cgi+cgit
-	def textOnCurve(self,cgi,text,s,r,top):
+	def textOnCurve(self,cgi,text,s,r,type='top'):
+		curLayer=cgi.curLayer
 		step=degrees(atan2(s,r))*1.2
 		#step=atan2(r,s)
 		font=Font(cgi,{})
 		line=Line(cgi,{})
 		if self.debug:print('parametric.demoTextOnCurve.step r s',step,r,s)
-		if top:
-			r=-r
-		else:
+		if type=='top':
+			rx=0
+			ry=-r
+		elif type=='bottom':
+			rx=0
+			ry=r
 			step=-step
+		elif type=='right':
+			rx=r
+			ry=0
 		for i,ch in enumerate(text):
 			if self.debug:print('parametric.demoTextOnCurve.i',i,ch)
 			cgit=CGI()
 			font=Font(cgit,{})
 			line=Line(cgit,{})
 			cgit=font.generate(ch,cgit)
-			if top:
+			if type=='top':
 				self.move(cgit,[-50,-100])
-			else:
+			elif type=='bottom':
 				self.move(cgit,[-50,0])
+			elif type=='right':
+				self.move(cgit,[0,-50])
 			self.scale(cgit,0.01*s)
-			self.move(cgit,[0,r])
+			self.move(cgit,[rx,ry])
 			self.rotate(cgit,step*i-step*((len(text)-1)/2))
 			cgi=cgi+cgit
 		return cgi
@@ -180,12 +190,14 @@ class Parametric():
 			cgis=self.square([1,4],center=True)
 			self.move(cgis,[5+4,10*i])
 			cgi=cgi+cgis
-	def demoKeyTest(self,cgi,text,textt,textb,textl,textr):
+	def generateKey(self,text,textt,textb,textl,textr,frame=True):
+		cgi=CGI()
 		font=Font(cgi,{})
 		line=Line(cgi,{})
-		cgit=CGI()
-		cgit=self.square([30,30],center=True)
-		cgi=cgi+cgit
+		if frame:
+			cgit=CGI()
+			cgit=self.square([30,30],center=True)
+			cgi=cgi+cgit
 		cgit=CGI()
 		cgit.createLayer('1',(255,255,0))
 		circle=Circle(cgit,{})
@@ -198,15 +210,18 @@ class Parametric():
 		cgi=cgi+cgis
 
 		cgit=CGI()
-		cgit.createLayer('3',(0,255,0),50,10)#engrave
-		cgit=self.textOnCurve(cgit,text,2,8,True)
-		cgi=cgi+cgit
+		cgi.createLayer('3',(0,255,0),50,10)#engrave
+		cgit=self.textOnCurve(cgit,text,2,8,'top')
+		#cgi=cgi+cgit
+		cgi.toLayer(cgit,'3')
 		cgit=CGI()
-		cgit=self.textOnCurve(cgit,textt,2,11,True)
-		cgi=cgi+cgit
+		cgit=self.textOnCurve(cgit,textt,2,11,'top')
+		#cgi=cgi+cgit
+		cgi.toLayer(cgit,'3')
 		cgit=CGI()
-		cgit=self.textOnCurve(cgit,textb,2,11,False)
-		cgi=cgi+cgit
+		cgit=self.textOnCurve(cgit,textb,2,11,'bottom')
+		#cgi=cgi+cgit
+		cgi.toLayer(cgit,'3')
 
 		cgit=CGI()
 		font=Font(cgit,{})
@@ -215,17 +230,52 @@ class Parametric():
 		self.move(cgit,[-50,-50])
 		self.scale(cgit,0.01*4)
 		self.move(cgit,[-10,0])
-		cgi=cgi+cgit
+		#cgi=cgi+cgit
+		cgi.toLayer(cgit,'3')
 
 		cgit=CGI()
-		font=Font(cgit,{})
-		line=Line(cgit,{})
-		cgit=font.generate(textr)
-		self.move(cgit,[-50,-50])
-		self.scale(cgit,0.01*4)
-		self.move(cgit,[10,0])
+		if len(textr)==1:
+			font=Font(cgit,{})
+			line=Line(cgit,{})
+			cgit=font.generate(textr)
+			self.move(cgit,[-50,-50])
+			self.scale(cgit,0.01*4)
+			self.move(cgit,[10,0])
+		else:
+			cgit=self.textOnCurve(cgit,textr,2,11,'right')
+		#cgi=cgi+cgit
+		cgi.toLayer(cgit,'3')
+		return cgi
+	def generateKeyboard(self):
+		cgi=CGI()
+		font=Font(cgi,{})
+		line=Line(cgi,{})
+		border=5
+		cgit=CGI()
+		cgit=self.square([30*10+border*2,30*4+border*2],center=False)
+		self.move(cgit,[0,-30*4-border*2])
 		cgi=cgi+cgit
-
+		testAxis=True
+		if testAxis:
+			cgit=CGI()
+			cgit=self.square([10,10],center=True)
+			cgi=cgi+cgit
+		data=[]
+		with open('keyboard.csv', newline='') as csvfile:
+			reader = csv.reader(csvfile, delimiter=' ', quotechar='"')
+			for row in reader:
+				data.append(list(row))
+				#print(', '.join(row))
+		i=1
+		for y in range(4):
+			for x in range(10):
+				d=data[i]
+				print('generateKeyboard.d',d)
+				cgit=self.generateKey(d[0],d[1],d[3],d[4],d[2],frame=False)#generateKey(self,text,textt,textb,textl,textr,frame=True):
+				self.move(cgit,[30*x+15+border,-30*4+15-border+30*y])
+				cgi=cgi+cgit
+				d+=1
+		return cgi
 	def event(self,pg,cgi,event,state,layer):
 		cmdMsg=''
 		if event.type==pg.KEYDOWN and event.key==pg.K_p:
@@ -239,9 +289,13 @@ class Parametric():
 			#self.demoHoleSizeTest(cgi)
 			#self.textOnCurve(cgi,'enterthematrix',2,15,True)
 			#self.textOnCurve(cgi,'1235456',2,18,True)
-			#demoTextOnCurve(self,cgi,text,s,r,top):
-			self.demoKeyTest(cgi,'top','toptop','bottom','l','r')#cgi,text,textt,textb,textl,textr)
-
+			#self.textOnCurve(cgi,'1235456',2,18,'top')
+			#self.textOnCurve(cgi,'1235456',2,18,'right')
+			#--demoTextOnCurve(self,cgi,text,s,r,top):
+			#cgit=self.generateKey('top','toptop','bottom','l','r')#cgi,text,textt,textb,textl,textr)
+			#cgit=self.generateKey('top','toptop','bottom','l','stop')#cgi,text,textt,textb,textl,textr)
+			cgit=self.generateKeyboard()
+			cgi=cgi+cgit
 
 			#cgi.addEntity(layer,'line',[[0,0],[0,10]])
 			#cgi.data[layer]['bezier'].append([[0,0],[0,10],[10,10],[10,0]])

@@ -4,7 +4,7 @@ class CGI:
 		#         {layer{objectType[objectData]}}
 		self.data={'0':{'line':[]}}
 		self.selection={'0':{'line':[]}}
-		self.debug=True
+		self.debug=False
 		self.curLayer='0'
 		self.layers={'0':{'color':(255,255,255),'M4':1000,'power':80}}
 	def loadJson(self,filename):
@@ -50,6 +50,28 @@ class CGI:
 				if not oType in self.data[layer].keys():
 					self.data[layer][oType]=[]
 					self.selection[layer][oType]=[]
+				for dat in other.data[layer][oType]:
+					if self.debug:print('cgi.add.dat',dat)
+					self.addEntity(oType,dat)
+					#self.data[layer][oType].append(dat)
+					#self.selection[layer][oType].append(False)
+		return self
+	def toLayer(self,other,targetLayer):
+		if self.debug:print('cgi.add.self.data.begin -----------------(o)(o)-----')
+		if self.debug:print('cgi.add.self.data',self.data)
+		if self.debug:print('cgi.add.self.layers',self.layers)
+		if self.debug:print('cgi.add.other.data',other.data)
+		if self.debug:print('cgi.add.other.layers',other.layers)
+		self.curLayer=targetLayer
+		#if not targetLayer in self.layers:
+		#	self.createLayer(targetLayer,other.layers[targetLayer]['color'],other.layers[layer]['M4'],other.layers[layer]['power'])
+		for layer in other.data.keys():
+			if self.debug:print('cgi.add.layer',layer)
+			for oType in other.data[layer].keys() :
+				if self.debug:print('cgi.add.otype',oType)
+				if not oType in self.data[targetLayer].keys():
+					self.data[targetLayer][oType]=[]
+					self.selection[targetLayer][oType]=[]
 				for dat in other.data[layer][oType]:
 					if self.debug:print('cgi.add.dat',dat)
 					self.addEntity(oType,dat)
