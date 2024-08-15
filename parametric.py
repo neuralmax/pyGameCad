@@ -262,9 +262,13 @@ class Parametric():
 			cgi=cgi+cgit
 		data=[]
 		with open('keyboard.csv', newline='') as csvfile:
-			reader = csv.reader(csvfile, delimiter=' ', quotechar='"')
+			reader = csv.reader(csvfile, delimiter=',', quotechar='"')
 			for row in reader:
-				data.append(list(row))
+				readrow=[]
+				for cell in row:
+					readrow.append(str(cell).lower())
+				data.append(readrow)
+
 				#print(', '.join(row))
 		i=1
 		for y in range(4):
@@ -290,12 +294,12 @@ class Parametric():
 			#self.textOnCurve(cgi,'enterthematrix',2,15,True)
 			#self.textOnCurve(cgi,'1235456',2,18,True)
 			#self.textOnCurve(cgi,'1235456',2,18,'top')
-			#self.textOnCurve(cgi,'1235456',2,18,'right')
+			self.textOnCurve(cgi,'0!',2,18,'top')
 			#--demoTextOnCurve(self,cgi,text,s,r,top):
 			#cgit=self.generateKey('top','toptop','bottom','l','r')#cgi,text,textt,textb,textl,textr)
 			#cgit=self.generateKey('top','toptop','bottom','l','stop')#cgi,text,textt,textb,textl,textr)
-			cgit=self.generateKeyboard()
-			cgi=cgi+cgit
+			#cgit=self.generateKeyboard()
+			#cgi=cgi+cgit
 
 			#cgi.addEntity(layer,'line',[[0,0],[0,10]])
 			#cgi.data[layer]['bezier'].append([[0,0],[0,10],[10,10],[10,0]])
