@@ -65,8 +65,8 @@ class Parametric():
 		cgitl=line.generate((fx,sy),(fx,fy),cgitl)
 		cgisq=cgisq+cgitl
 		return cgisq
-	def demoTexInLine(self,cgi):
-		for i,charname in enumerate(fontdata.keys()):
+	def textInLine(self,cgi,text):
+		for i,charname in enumerate(text):
 			#charname='a'
 			if self.debug:print('parametric.charname',charname,i)
 			cgit=CGI()
@@ -209,9 +209,16 @@ class Parametric():
 		self.rotate(cgis,90)
 		cgi=cgi+cgis
 
+		arrowCodes=['<|','>|','^|','v|']
 		cgit=CGI()
 		cgi.createLayer('3',(0,255,0),50,10)#engrave
-		cgit=self.textOnCurve(cgit,text,2,8,'top')
+		if text in arrowCodes:
+			cgit=font.generate(text)
+			self.move(cgit,[-50,-50])
+			self.scale(cgit,0.01*2)
+			self.move(cgit,[0,-8])
+		else:
+			cgit=self.textOnCurve(cgit,text,2,8,'top')
 		#cgi=cgi+cgit
 		cgi.toLayer(cgit,'3')
 		cgit=CGI()
@@ -219,7 +226,13 @@ class Parametric():
 		#cgi=cgi+cgit
 		cgi.toLayer(cgit,'3')
 		cgit=CGI()
-		cgit=self.textOnCurve(cgit,textb,2,11,'bottom')
+		if textb=='cc':
+			cgit=font.generate(textb)
+			self.move(cgit,[-50,-50])
+			self.scale(cgit,0.01*2)
+			self.move(cgit,[0,11])
+		else:
+			cgit=self.textOnCurve(cgit,textb,2,11,'bottom')
 		#cgi=cgi+cgit
 		cgi.toLayer(cgit,'3')
 
@@ -233,8 +246,9 @@ class Parametric():
 		#cgi=cgi+cgit
 		cgi.toLayer(cgit,'3')
 
+		symbolCodes=['<=','<>','>=','$$','^|','<|','>|','v|','cc','||']
 		cgit=CGI()
-		if len(textr)==1:
+		if len(textr)==1 or textr in symbolCodes:
 			font=Font(cgit,{})
 			line=Line(cgit,{})
 			cgit=font.generate(textr)
@@ -255,7 +269,7 @@ class Parametric():
 		cgit=self.square([30*10+border*2,30*4+border*2],center=False)
 		self.move(cgit,[0,-30*4-border*2])
 		cgi=cgi+cgit
-		testAxis=True
+		testAxis=False
 		if testAxis:
 			cgit=CGI()
 			cgit=self.square([10,10],center=True)
@@ -275,10 +289,13 @@ class Parametric():
 			for x in range(10):
 				d=data[i]
 				print('generateKeyboard.d',d)
-				cgit=self.generateKey(d[0],d[1],d[3],d[4],d[2],frame=False)#generateKey(self,text,textt,textb,textl,textr,frame=True):
+				# 0   1      2    3     4
+				# top toptop left right bottom
+				cgit=self.generateKey(d[0],d[1], d[4], d[2], d[3],frame=False)
+				#generateKey(self,    text,textt,textb,textl,textr,frame=True):
 				self.move(cgit,[30*x+15+border,-30*4+15-border+30*y])
 				cgi=cgi+cgit
-				d+=1
+				i+=1
 		return cgi
 	def event(self,pg,cgi,event,state,layer):
 		cmdMsg=''
@@ -294,12 +311,22 @@ class Parametric():
 			#self.textOnCurve(cgi,'enterthematrix',2,15,True)
 			#self.textOnCurve(cgi,'1235456',2,18,True)
 			#self.textOnCurve(cgi,'1235456',2,18,'top')
-			self.textOnCurve(cgi,'0!',2,18,'top')
+
+			#()_<>;=^-+=:?/*,.#[]?~|\{}
+			#self.textInLine(cgi,"!@$%&'()[]{}\\/|-+=_<>^#*?~.,;:")
+			#             0v   1v   2v   3v   4v   5    6    7v
+			#symbolCodes=['<=','<>','>=','$$','^|','<|','>|','v|']
+			#font=Font(cgi,{})
+			#cgit=font.generate(symbolCodes[6])
+			#cgit=font.generate('cc')
+			#self.textOnCurve(cgi,'!@$',2,18,'top')
+
 			#--demoTextOnCurve(self,cgi,text,s,r,top):
 			#cgit=self.generateKey('top','toptop','bottom','l','r')#cgi,text,textt,textb,textl,textr)
 			#cgit=self.generateKey('top','toptop','bottom','l','stop')#cgi,text,textt,textb,textl,textr)
-			#cgit=self.generateKeyboard()
-			#cgi=cgi+cgit
+
+			cgit=self.generateKeyboard()
+			cgi=cgi+cgit
 
 			#cgi.addEntity(layer,'line',[[0,0],[0,10]])
 			#cgi.data[layer]['bezier'].append([[0,0],[0,10],[10,10],[10,0]])

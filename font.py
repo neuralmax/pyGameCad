@@ -27,7 +27,9 @@ class Font():
 			for oType in cgi.data[layer].keys() :
 				for dat in cgi.data[layer][oType]:
 					cgi.data[layer][oType].append(dat)
-	def generate(self,char,cgi=CGI()):
+	def generate(self,char,cgi=False):
+		if not cgi:
+			cgi=CGI()
 		Bezier(cgi,{})
 		Font(cgi,{})
 		self.glyph(1,char,cgi)

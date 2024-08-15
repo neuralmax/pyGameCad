@@ -11,7 +11,7 @@ class Line():
 		#self.selection={'0':{'lines':[]}}
 		self.prime(cgi)
 		keys['l']=self.name
-		self.debug=True
+		self.debug=False
 	def prime(self,cgi):
 		for layer in cgi.data.keys():
 			cgi.data[layer]['line']=[]

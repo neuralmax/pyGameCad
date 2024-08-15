@@ -1,4 +1,4 @@
-# to do
+# to dop
 #--- for keyboard project ---
 #[ ] generate keyboard
 #[ ] export to GCODE

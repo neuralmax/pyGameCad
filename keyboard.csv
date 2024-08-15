@@ -1,12 +1,12 @@
 top,toptop,left,right,bottom
 EDIT,blue,1,!,DEF FN
 CAPS LOCK,red,2,@,fn
-true video,magenta,3,#,line
-inv video,green,4,$,open #
-<,cyan,5,%,close #
-v,yellow,6,&,move
-^,white,7,',erase
->,,8,(,POINT
+true vid,magenta,3,#,line
+inv vid,green,4,$,open #
+<|,cyan,5,%,close #
+v|,yellow,6,&,move
+^|,white,7,',erase
+>|,,8,(,POINT
 graphics,,9,),cat
 delete,black,0,_,format
 sin,plot,Q,<=,asn
@@ -18,7 +18,7 @@ str$,return,Y,and,[
 chr$,if,U,or,]
 code,input,I,at,in
 peek,poke,O,;,out
-tab,print,P,=,?
+tab,print,P,||,cc
 read,new,A,stop,~
 restore,save,S,not,|
 data,dim,D,step,\
@@ -31,7 +31,7 @@ usr,let,L,=,attr
 ENTER,,,,
 CAPS SHIFT,,,,
 ln,copy,Z,:,beep
-exp,clear,X,œ,ink
+exp,clear,X,$$,ink
 lprint,cont,C,?,paper
 llist,cls,V,/,flash
 bin,border,B,*,bright
