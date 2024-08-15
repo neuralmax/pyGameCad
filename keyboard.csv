@@ -1,0 +1,41 @@
+top,toptop,left,right,bottom
+EDIT,blue,1,!,DEF FN
+CAPS LOCK,red,2,@,fn
+true video,magenta,3,#,line
+inv video,green,4,$,open #
+<,cyan,5,%,close #
+v,yellow,6,&,move
+^,white,7,',erase
+>,,8,(,POINT
+graphics,,9,),cat
+delete,black,0,_,format
+sin,plot,Q,<=,asn
+cos,draw,W,<>,acs
+tan,rem,E,>=,atn
+int,run,R,<,verify
+rnd,rand,T,>,merge
+str$,return,Y,and,[
+chr$,if,U,or,]
+code,input,I,at,in
+peek,poke,O,;,out
+tab,print,P,=,?
+read,new,A,stop,~
+restore,save,S,not,|
+data,dim,D,step,\
+sgn,for,F,to,{
+abs,goto,G,then,}
+sqr,gosub,H,^,circle
+val,load,J,-,val$
+len,list,K,+,screen$
+usr,let,L,=,attr
+ENTER,,,,
+CAPS SHIFT,,,,
+ln,copy,Z,:,beep
+exp,clear,X,œ,ink
+lprint,cont,C,?,paper
+llist,cls,V,/,flash
+bin,border,B,*,bright
+inkey$,next,N,",",over
+pi,pause,M,.,inverse
+SYMBOL SHIFT,,,,
+SPACE,,,,
