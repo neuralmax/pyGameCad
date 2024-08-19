@@ -66,7 +66,8 @@ class Parametric():
 		cgisq=cgisq+cgitl
 		return cgisq
 	def textInLine(self,cgi,text):
-		for i,charname in enumerate(text):
+		for i,charname in enumerate(fontdata.keys()):
+		#for i,charname in enumerate(text):
 			#charname='a'
 			if self.debug:print('parametric.charname',charname,i)
 			cgit=CGI()
@@ -192,6 +193,7 @@ class Parametric():
 			cgi=cgi+cgis
 	def generateKey(self,text,textt,textb,textl,textr,frame=True):
 		cgi=CGI()
+		cgi.createLayer('0',(255,255,255),feedRate=200)
 		font=Font(cgi,{})
 		line=Line(cgi,{})
 		if frame:
@@ -269,6 +271,13 @@ class Parametric():
 		cgit=self.square([30*10+border*2,30*4+border*2],center=False)
 		self.move(cgit,[0,-30*4-border*2])
 		cgi=cgi+cgit
+		#mounting holes
+		for x,y in [[0+border,0-border],[30*10+border,0-border],[0+border,-30*4-border],[30*10+border,-30*4-border]]:
+			cgit=CGI()
+			cgit.createLayer('1',(255,255,0))
+			circle=Circle(cgit,{})
+			cgit=circle.generate([x,y],4.1/2,cgit)
+			cgi=cgi+cgit
 		testAxis=False
 		if testAxis:
 			cgit=CGI()
@@ -282,26 +291,28 @@ class Parametric():
 				for cell in row:
 					readrow.append(str(cell).lower())
 				data.append(readrow)
-
 				#print(', '.join(row))
-		i=1
-		for y in range(4):
-			for x in range(10):
-				d=data[i]
-				print('generateKeyboard.d',d)
-				# 0   1      2    3     4
-				# top toptop left right bottom
-				cgit=self.generateKey(d[0],d[1], d[4], d[2], d[3],frame=False)
-				#generateKey(self,    text,textt,textb,textl,textr,frame=True):
-				self.move(cgit,[30*x+15+border,-30*4+15-border+30*y])
-				cgi=cgi+cgit
-				i+=1
+		generateText=True
+		if generateText:
+			i=1
+			for y in range(4):
+				for x in range(10):
+					d=data[i]
+					print('generateKeyboard.d',d)
+					# 0   1      2    3     4
+					# top toptop left right bottom
+					cgit=self.generateKey(d[0],d[1], d[4], d[2], d[3],frame=False)
+					#generateKey(self,    text,textt,textb,textl,textr,frame=True):
+					self.move(cgit,[30*x+15+border,-30*4+15-border+30*y])
+					cgi=cgi+cgit
+					i+=1
 		return cgi
 	def event(self,pg,cgi,event,state,layer):
 		cmdMsg=''
 		if event.type==pg.KEYDOWN and event.key==pg.K_p:
 			if self.debug:print('parametric.event')
-			#self.demoTexInLine(cgi)
+			#self.textInLine(cgi,'')
+			#self.scale(cgi,0.01*5)
 			#self.demoTextOnCurve(cgi)
 			#self.demoEngravingSpindleTest(cgi)
 			#self.demoTextSizeTest(cgi)
@@ -323,11 +334,12 @@ class Parametric():
 
 			#--demoTextOnCurve(self,cgi,text,s,r,top):
 			#cgit=self.generateKey('top','toptop','bottom','l','r')#cgi,text,textt,textb,textl,textr)
-			#cgit=self.generateKey('top','toptop','bottom','l','stop')#cgi,text,textt,textb,textl,textr)
-
+			#cgit=self.generateKey('top','+','+','s','s')#cgi,text,textt,textb,textl,textr)
+			#self.move(cgit,[15,-15])
 			cgit=self.generateKeyboard()
 			cgi=cgi+cgit
-
+			cgi.layers['0']['feedRate']=300
+			cgi.layers['1']['feedRate']=300
 			#cgi.addEntity(layer,'line',[[0,0],[0,10]])
 			#cgi.data[layer]['bezier'].append([[0,0],[0,10],[10,10],[10,0]])
 			#cgi.selection[layer]['bezier'].append(False)

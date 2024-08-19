@@ -6,7 +6,7 @@ class CGI:
 		self.selection={'0':{'line':[]}}
 		self.debug=False
 		self.curLayer='0'
-		self.layers={'0':{'color':(255,255,255),'M4':1000,'power':80}}
+		self.layers={'0':{'color':(255,255,255),'M4':1000,'power':80,'feedRate':1000}}
 	def loadJson(self,filename):
 		f=open(filename)
 		self.data=json.load(f)
@@ -24,9 +24,9 @@ class CGI:
 		if self.debug:print('cgi.addEntity',self.data,oType)
 		self.data[self.curLayer][oType].append(dat)
 		self.selection[self.curLayer][oType].append(False)
-	def createLayer(self,lName,color,m4=1000,power=80):
+	def createLayer(self,lName,color,m4=1000,power=80,feedRate=1000):
 		#{'0':{'line':[]}}
-		self.layers[lName]={'color':color,'M4':m4,'power':power}
+		self.layers[lName]={'color':color,'M4':m4,'power':power,'feedRate':feedRate}
 		self.data[lName]={}
 		self.selection[lName]={}
 		self.curLayer=lName
@@ -42,7 +42,7 @@ class CGI:
 		for layer in other.data.keys():
 			if self.debug:print('cgi.add.layer',layer)
 			if not layer in self.layers:
-				self.createLayer(layer,other.layers[layer]['color'],other.layers[layer]['M4'],other.layers[layer]['power'])
+				self.createLayer(layer,other.layers[layer]['color'],other.layers[layer]['M4'],other.layers[layer]['power'],other.layers[layer]['feedRate'])
 			else:
 				self.curLayer=layer
 			for oType in other.data[layer].keys() :

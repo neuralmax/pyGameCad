@@ -55,6 +55,7 @@ class ExportGcode:
 				spinsp=cgi.layers[layerNm]['M4']
 				data+='M4 S'+str(spinsp)+' ; spindle speed\n'
 				power=cgi.layers[layerNm]['power']
+				feedRate=cgi.layers[layerNm]['feedRate']
 				data+='M68 E0 Q'+str(power)+'; set power of laser\n'
 				for oType in cgi.data[layerNm].keys():
 					for dat in cgi.data[layerNm][oType]:
@@ -65,21 +66,21 @@ class ExportGcode:
 							xa,ya,xb,yb=line.unpack(dat)
 							data+='G0 X'+str(xa)+' Y'+str(-ya)+'; Rapid to initial position\n'
 							data+='G0 Z0.000\n'
-							data+='G1 Z-1.000 F1000 ; plunge\n'
+							data+='G1 Z-1.000 F'+str(feedRate)+' ; plunge\n'
 							data+='; cut\n'
-							data+='G1 X'+str(xb)+' Y'+str(-yb)+' F500\n'
+							data+='G1 X'+str(xb)+' Y'+str(-yb)+' F'+str(feedRate)+'\n'
 						elif oType=='circle':
 							x,y,r=circle.unpack(dat)
 							data+='G0 X'+str(x)+' Y'+str(-y+r)+'; Rapid to initial position\n'
 							data+='G0 Z0.000\n'
-							data+='G1 Z-1.000 F1000 ; plunge\n'
+							data+='G1 Z-1.000 F'+str(feedRate)+' ; plunge\n'
 							data+='; cut\n'
-							data+='G2 I'+str(x)+' J'+str(-r)+'\n'
+							data+='G2 I'+str(0)+' J'+str(-r)+'\n'
 						elif oType=='bezier':
 							xa,ya,xb,yb,xc,yc,xd,yd=bezier.unpack(dat)
 							data+='G0 X'+str(xa)+' Y'+str(-ya)+'; Rapid to initial position\n'
 							data+='G0 Z0.000\n'
-							data+='G1 Z-1.000 F1000 ; plunge\n'
+							data+='G1 Z-1.000 F'+str(feedRate)+' ; plunge\n'
 							data+='; cut\n'
 							#data+='G5 X'+str(xb-xa)+' Y'+str(-yb-ya)+' I'+str(xc-xa)+' J'+str(-yc+ya)+' P'+str(xd)+' Q'+str(-yd)+'\n'
 							data+='G5.1 X'+str(xc)+' Y'+str(-yc)+' I'+str(xb-xa)+' J'+str(-yb+ya)+'\n'
