@@ -2,6 +2,7 @@ import json
 class CGI:
 	def __init__(self):
 		#         {layer{objectType[objectData]}}
+		self.plugins=False
 		self.data={'0':{'line':[]}}
 		self.selection={'0':{'line':[]}}
 		self.debug=False
@@ -24,7 +25,7 @@ class CGI:
 		if self.debug:print('cgi.addEntity',self.data,oType)
 		self.data[self.curLayer][oType].append(dat)
 		self.selection[self.curLayer][oType].append(False)
-	def createLayer(self,lName,color,m4=1000,power=80,feedRate=1000):
+	def createLayer(self,lName,color=(255,0,0),m4=1000,power=80,feedRate=1000):
 		#{'0':{'line':[]}}
 		self.layers[lName]={'color':color,'M4':m4,'power':power,'feedRate':feedRate}
 		self.data[lName]={}
@@ -78,3 +79,28 @@ class CGI:
 					#self.data[layer][oType].append(dat)
 					#self.selection[layer][oType].append(False)
 		return self
+	def getBox(self):#get boundin box
+		mxx=-9999
+		mxy=-9999
+		mnx=9999
+		mny=9999
+		for layer in self.layers.keys():
+			for oType in self.data[layer].keys():
+				for obj in self.data[layer][oType]:
+					if oType=='line':
+						for pnt in obj:
+							x,y=pnt
+							if mxx<x:mxx=x
+							if mxy<y:mxy=y
+							if mnx>x:mnx=x
+							if mny>y:mny=y
+					else:
+						minx,miny,maxx,maxy=self.plugins[oType].box(obj)
+						if maxx>mxx:mxx=maxx
+						if maxy>mxy:mxy=maxy
+						if minx<mnx:mnx=minx
+						if miny<mny:mny=miny
+		return mxx,mxy,mnx,mny
+	def getCentroid(self):
+		mxx,mxy,mnx,mny=self.getBox()
+		return (mxx-mnx)/2+mnx,(mxy-mny)/2+mny

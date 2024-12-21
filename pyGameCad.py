@@ -69,8 +69,10 @@ from parametric import Parametric
 plugins['parametric']=Parametric(cgi,commands,plugins)
 from exportgcode import ExportGcode
 plugins['exportgcode']=ExportGcode(cgi,commands)
+from vaseModeGrid import VaseModeGrid
+plugins['vaseModeGrid']=VaseModeGrid(cgi,commands)
 
-
+cgi.plugins=plugins
 
 
 def progman(cmd,scp,mod=''):#command manager (commandName,scope)
@@ -224,29 +226,12 @@ while mainLoop:
 			if event.key==pg.K_q:
 				mainLoop=False
 			if event.key==pg.K_z:
-				mxx=-9999
-				mxy=-9999
-				mnx=9999
-				mny=9999
-				for layer in cgi.layers.keys():
-					for oType in cgi.data[layer].keys():
-						for obj in cgi.data[layer][oType]:
-							if oType=='line':
-								for pnt in line:
-									x,y=pnt
-									if mxx<x:mxx=x
-									if mxy<y:mxy=y
-									if mnx>x:mnx=x
-									if mny>y:mny=y
-							else:
-								minx,miny,maxx,maxy=plugins[oType].box(obj)
-								if maxx>mxx:mxx=maxx
-								if maxy>mxy:mxy=maxy
-								if minx<mnx:mnx=minx
-								if miny<mny:mny=miny
-				panx=-mnx
-				pany=-mny
-				zoom=size[0]/(mxx-mnx)
+				cnx,cny=cgi.getCentroid()
+				szx,szy=size
+				szxw,szyw=screenToWorld(szx,szy,zoom,0,0)
+				panx=-cnx#-szxw/2
+				pany=-cnx#-szyw/2
+				zoom=size[1]/(cny*4)
 				if debug:print('zoom all',size[0],zoom)
 			if event.key==pg.K_l:progman('line','evt')
 			if event.key==pg.K_s:progman('select','evt')

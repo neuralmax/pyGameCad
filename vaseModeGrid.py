@@ -22,7 +22,7 @@ class VaseModeGrid():
 			#cgi.addEntity('circle',[[20,20],10])
 			#params
 			m=4
-			n=5
+			n=4
 			#solve
 			'''
 			data=[#example of hand solution
@@ -30,7 +30,15 @@ class VaseModeGrid():
 				[[0,3],[1,2],[1,2],[2,2]],
 				[[0,3],[1,3],[2,2],[2,3]],
 				[[0,1],[3,1],[3,1],[2,3]],
-			];
+			]
+			'''
+			'''
+			data=[#example of hand solution
+				[[[0,0],[0,0]],[[0,0],[1,0]],[[0,0],[1,1]],[[0,0],[1,1]],],
+				[[[1,1],[0,0]],[[0,1],[1,0]],[[0,1],[1,0]],[[0,1],[0,1]],],
+				[[[1,1],[0,0]],[[1,0],[1,0]],[[0,1],[1,1]],[[1,1],[0,1]],],
+				[[[1,0],[0,0]],[[1,0],[1,1]],[[1,0],[1,1]],[[1,1],[0,1]],]
+			]
 			'''
 			'''
 			nbrsa=[
@@ -55,6 +63,7 @@ class VaseModeGrid():
 			# 2 : z=1, d=2 -> horizontal rightwards
 			# 3 : z=0, d=2 |^ vertical upwards
 			# [ x<mod>, y<mod>, z(vertical/horzontal)<actual>, d(right,left,up,down)<actual> ]
+			'''
 			nbrs=[[#0
 				[ 0,-1,0,1],
 				[-1, 0,1,2],
@@ -72,10 +81,11 @@ class VaseModeGrid():
 				[ 0,-1,0,1],
 				[-1, 0,0,1],
 			]]
+			'''
 			#[z][d-1]=nc
 			dirs=[[0,2],[1,3]]
 			#init matrix
-			data=[[[0,0] for y in range(n)] for x in range(m)]
+			data=[[[[0,0],[0,0]] for y in range(n)] for x in range(m)]
 			front=[]
 			#seed matrix with init front
 			for i in range(1,n):
@@ -106,19 +116,26 @@ class VaseModeGrid():
 						if x+nx<0 and x+nx<m-1 and y+ny<0 and y+ny<n-1:
 							if data[x+nx][y+ny][nz]!=0:
 								front.append([[x+nx][y+ny][nz][nd]])
+			'''
 			#generate
 			cgi.createLayer('maze',(0,255,0))
-			for x,dat in enumerate(data):
-				for y,c in enumerate(dat):
-					if c[0]==1:cgi.addEntity('line',[[x*10,y*10],[x*10+8,y*10]])
-					if c[0]==2:cgi.addEntity('line',[[x*10+2,y*10],[x*10+10,y*10]])
-					if c[0]==3:cgi.addEntity('line',[[x*10,y*10],[x*10+10,y*10]])
-					if c[1]==1:cgi.addEntity('line',[[x*10,y*10],[x*10,y*10+8]])
-					if c[1]==2:cgi.addEntity('line',[[x*10,y*10+2],[x*10,y*10+10]])
-					if c[1]==3:cgi.addEntity('line',[[x*10,y*10],[x*10,y*10+10]])
+			for y,dat in enumerate(data):
+				for x,c in enumerate(dat):
+					if c[0][0]==1 and c[0][1]==0:
+						cgi.addEntity('line',[[x*10,y*10],[x*10+8,y*10]])
+					if c[0][0]==0 and c[0][1]==1:
+						cgi.addEntity('line',[[x*10+2,y*10],[x*10+10,y*10]])
+					if c[0][0]==1 and c[0][1]==1:
+						cgi.addEntity('line',[[x*10,y*10],[x*10+10,y*10]])
+					if c[1][0]==1 and c[1][1]==0:
+						cgi.addEntity('line',[[x*10,y*10],[x*10,y*10+8]])
+					if c[1][0]==0 and c[1][1]==1:
+						cgi.addEntity('line',[[x*10,y*10+2],[x*10,y*10+10]])
+					if c[1][0]==1 and c[1][1]==1:
+						cgi.addEntity('line',[[x*10,y*10],[x*10,y*10+10]])
 			cgi.createLayer('ends',(255,0,0))
-			for x in range(m+1):
-				for y in range(n+1):
+			for y in range(m+1):
+				for x in range(n+1):
 					cgi.addEntity('circle',[[x*10,y*10],1])
 			return True
 		else:

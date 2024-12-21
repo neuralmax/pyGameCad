@@ -5,6 +5,7 @@ class Circle():
 	def __init__(self,cgi,keys):
 		self.name='circle'
 		self.drawable=True
+		
 		#self.data=     {'0':{'lines':[]}}
 		#self.selection={'0':{'lines':[]}}
 		self.addTypeCgi(cgi)
